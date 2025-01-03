@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  accessToken  String
+  role         Role
+  image        String?
+  devices      Device[]
+  socialLinks  SocialLink[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SocialLink {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  platform    String
+  url         String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, platform])
+}
+
+enum Role {
+  ADMIN
+  FOUNDER
+  CO_FOUNDER
+  GROUP_SUPPORT
+  CORE_DEV
+  UI_UX_DESIGN
+  MAINTAINER
+}
+
+model Device {
+  id           Int      @id @default(autoincrement())
+  name         String
+  codename     String
+  imageUrl     String?
+  maintainer   User     @relation(fields: [maintainerId], references: [id])
+  maintainerId Int
+  builds       Build[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Build {
+  id             Int         @id @default(autoincrement())
+  device         Device      @relation(fields: [deviceId], references: [id])
+  deviceId       Int
+  androidVersion String
+  buildLinks     BuildLink[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model BuildLink {
+  id          Int      @id @default(autoincrement())
+  build       Build    @relation(fields: [buildId], references: [id])
+  buildId     Int
+  linkUrl     String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model OrionVersion {
+  id          Int                  @id @default(autoincrement())
+  version     String
+  changelog   String?              @db.Text
+  description String?              @db.Text
+  releaseDate DateTime?
+  bannerImage String?
+  screenshots VersionScreenshot[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+}
+
+model VersionScreenshot {
+  id              Int          @id @default(autoincrement())
+  orionVersion    OrionVersion @relation(fields: [orionVersionId], references: [id])
+  orionVersionId  Int
+  imageUrls       String       @db.Text
+  description     String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
