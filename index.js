@@ -11,7 +11,7 @@ const port = 4000;
 
 // route
 app.get("/", (req, res) => {
-  res.send(200, {
+  res.status(200).json({
     success: true,
     message: "OrionOS server is up and running 🚀",
     author: "romi.yusna @ OrionOS Team",
