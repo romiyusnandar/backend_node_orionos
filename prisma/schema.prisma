@@ -27,8 +27,9 @@ model User {
 
 model SocialLink {
   id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
+  icon        String
   platform    String
   url         String
   createdAt   DateTime @default(now())
